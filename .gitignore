@@ -1,1 +1,6 @@
-workspace/
+/workspace/*
+!/workspace/.gitkeep
+/carsim/*
+!/carsim/.gitkeep
+!/carsim/setup_shells/*
+!/carsim/config/*
