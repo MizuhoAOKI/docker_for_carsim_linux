@@ -1,4 +1,4 @@
-# DockerによるC++開発環境構築メモ
+# DockerによるC++開発環境構築メモ (Carsim_Linux使用想定環境)
 Dockerを使うと, 
 
 - ✅　一度設定ファイルを用意すれば, 同じ開発環境を何度でも容易に構築できる
@@ -10,18 +10,16 @@ Dockerを使うと,
 ## 構築環境の概要
 ※ Dockerfile, docker-compose.yml で設定を編集可能.
 
-- OS(Base Image): Ubuntu 20:04 
+- OS(Base Image): Ubuntu 18.04
 - installs: 
+    - sudo
     - git 
     - vim
+    - tree
     - build-essential 
     - cmake 
-    - libeigen3-dev 
-    - libboost-dev 
-    - gdb 
-- Image Name : cpp-env
-- Container Name : cppdev
-
+- Image Name : ubuntu1804image
+- Container Name : ubuntu1804container
 
 ## Dockerとは
 - [Dockerの概要](https://docs.docker.jp/get-started/overview.html)
@@ -46,46 +44,46 @@ Dockerを使うと,
 
     ``` 
     $ cd (作業ディレクトリ)
-    $ git clone https://github.com/MizuhoAOKI/docker_cpp_env.git 
+    $ git clone https://github.com/MizuhoAOKI/docker_ubuntu1804_env.git 
     ```
 
 2. イメージをbuild, コンテナを生成
     ```
-    $ cd docker_cpp_env
+    $ cd docker_ubuntu1804_env
     $ docker-compose up -d
     ```
     ※ -d: コンテナをバックグラウンドで実行するオプション
 
 3. コンテナの開始
     ```
-    $ docker start cppdev
+    $ docker start ubuntu1804container
     ```
-    ※ cppdevはコンテナの名称
+    ※ ubuntu1804containerはコンテナの名称,  `docker ps -a` で確認可能
 
 4. コンテナの実行
     ```
-    $ docker exec -it cppdev bash
-    root@[コンテナID]:/workspace#
+    $ docker exec -it ubuntu1804container bash
+    normaluser@[コンテナID]:/workspace#
     ```
-    - root権限でコンテナに入れる. 
+    - normaluser権限でコンテナに入れる. 
     - コンテナ内/workspaceで作業すれば, ローカルPC側の(作業ディレクトリ)/docker_cpp_env/workspaceとデータが自動で同期する.
     
 5. ソースコードのClone, C++プログラムの実行
     ```
-    root@[コンテナID]:/workspace# git clone (例)https://github.com/kohonda/multi-task-MPC.git
-    root@[コンテナID]:/workspace# mkdir build
-    root@[コンテナID]:/workspace# cd build
-    root@[コンテナID]:/workspace/multi-task-MPC/build# cmake ..
-    root@[コンテナID]:/workspace/multi-task-MPC/build# make
-    root@[コンテナID]:/workspace/multi-task-MPC/build# ./mpc_cgmres
+    normaluser@[コンテナID]:/workspace# git clone (例)https://github.com/kohonda/multi-task-MPC.git
+    normaluser@[コンテナID]:/workspace# mkdir build
+    normaluser@[コンテナID]:/workspace# cd build
+    normaluser@[コンテナID]:/workspace/multi-task-MPC/build# cmake ..
+    normaluser@[コンテナID]:/workspace/multi-task-MPC/build# make
+    normaluser@[コンテナID]:/workspace/multi-task-MPC/build# ./mpc_cgmres
     
     ...C++プログラム実行...
     
     ```
 6. コンテナから出る, コンテナの停止
     ```
-    root@[コンテナID]:/workspace/# exit
-    $ docker stop cppdev 
+    normaluser@[コンテナID]:/workspace/# exit
+    $ docker stop ubuntu1804container 
     ```
     また次回立ち上げる時にはstart, execが必要.
 
@@ -94,14 +92,14 @@ Dockerを使うと,
     ``` 
     $ docker images 
     REPOSITORY                       TAG                 IMAGE ID            CREATED             SIZE
-    cpp-env                          latest              e421cc616236        22 seconds ago      648MB
-    ubuntu                           20.04               9140108b62dc        2 weeks ago         72.9MB
+    ubuntu1804image                          latest              e421cc616236        22 seconds ago      648MB
+    ubuntu                           18.04               9140108b62dc        2 weeks ago         72.9MB
     ```
 - コンテナを確認
     ``` 
     $ docker ps -a 
     CONTAINER ID        IMAGE                            COMMAND                  CREATED              STATUS                  PORTS               NAMES
-    45e6085e0d4f        cpp-env                           "/bin/bash"             About a minute ago   Up About a minute                           cppdev
+    45e6085e0d4f        ubuntu1804image                           "/bin/bash"             About a minute ago   Up About a minute                           ubuntu1804container
     ```
 
 ## リポジトリ構成
@@ -109,10 +107,12 @@ Dockerを使うと,
 docker_cpp_dev
 ├── .git
 ├── .gitignore
+├── .devcontainer
 ├── Dockerfile
 ├── docker-compose.yml
 └── workspace
 ```
+
 - 作業ディレクトリ: workspace/
 - 設定の変更にはDockerfile, docker-compose.ymlを編集する.
 
@@ -157,16 +157,19 @@ $ docker-compose down --rmi all --volumes --remove-orphans
 
 8. C++のソースコードをclone
     ``` 
-    $ git clone (例)https://github.com/kohonda/multi-task-MPC.git
+    $ git clone (例)https://github.com/MizuhoAOKI/CarsimLib_Linux.git
     ```
 
 8. CMakeのプロジェクトとして認識させる
     リポジトリ直下にCMakeLists.txtがある場合, 
     ```
-    $ cd multi-task-MPC
+    $ cd CarsimLib_Linux.git
     $ mkdir build
     $ cd build
     $ cmake ..
+    $ make
+    $ ./carsimlib
+    ... executing program ...
     ```
     - この操作はコンテナを立ち上げた直後のみ行えば良い. 
     -> VSCodeのCMakeツールにbuildディレクトリの場所を覚えさせるのが目的.(指定しないとworkspace/直下にbuild/を作ってしまう.)
