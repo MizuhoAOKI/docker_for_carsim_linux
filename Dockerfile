@@ -6,9 +6,12 @@ FROM ubuntu:18.04 as ubunt1804image
 # Environment variables : 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Get packages to develop c++ programs
-RUN apt-get update && \
-    apt-get install -y sudo git build-essential cmake tree sudo vim
+# Get packages to develop c++/python programs
+RUN apt update && \
+    apt install -y sudo git build-essential cmake tree sudo vim python3 python3-pip
+
+# install package list in requirements.txt
+RUN pip3 install numpy
 
 RUN mkdir workspace
 
