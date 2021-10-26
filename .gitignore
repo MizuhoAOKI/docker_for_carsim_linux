@@ -2,5 +2,5 @@
 !/workspace/.gitkeep
 /carsim/*
 !/carsim/.gitkeep
-!/carsim/setup_shells/*
-!/carsim/config/*
+!/carsim/setup_shells
+!/carsim/config
