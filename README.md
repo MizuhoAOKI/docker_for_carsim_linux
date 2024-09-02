@@ -1,3 +1,6 @@
+> [!CAUTION]
+> This repository is no longer maintained.
+
 # Ubuntu 18.04 env. for Carsim Linux
 See [this note](https://hackmd.io/3xnUw_hTT3WlnjrMmWYd_w?both) for more information about Carsim Linux. 
 
